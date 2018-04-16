@@ -37,10 +37,16 @@ function decipherCommand(command, param){
 function getTweets(){
   client.get('search/tweets', {q: 'okputadora'}, function(error, tweets, response) {
     console.log('most recent tweets from ', tweets.statuses[0].user.screen_name)
+    var tweetInfoArr = []
     tweets.statuses.forEach(tweet => {
-     console.log('text: ', tweet.text)
-     console.log('created: ',tweet.created_at)
+      var tweetInfo = {
+        text: tweet.text,
+        created: tweet.created_at
+      }
+      tweetInfoArr.push(tweetInfo)
     })
+    console.log(tweetInfoArr)
+    log(JSON.stringify(tweetInfoArr))
   });
 }
 
@@ -52,10 +58,14 @@ function getSongInfo(song){
   spotify
   .search({ type: 'track', query: song, limit: 1})
   .then(response => {
-    console.log('Song: ', response.tracks.items[0].name);
-    console.log('Album: ', response.tracks.items[0].album.name);
-    console.log('Artist: ', response.tracks.items[0].artists[0].name);
-    console.log('Link: ', response.tracks.items[0].external_urls.spotify);
+    var songInfo = {
+      Song: response.tracks.items[0].name,
+      Album: response.tracks.items[0].album.name,
+      Artist: response.tracks.items[0].artists[0].name,
+      Link: response.tracks.items[0].external_urls.spotify,
+    }
+    console.log(songInfo)
+    log(JSON.stringify(songInfo))
   })
   .catch(function(err) {
     console.log("I didn't recognize that song. Check your spelling and try again.");
@@ -71,14 +81,18 @@ function getMovieInfo(movie){
   axios.get('http://www.omdbapi.com/?apikey='+ process.env.OMDB_KEY +
             '&t=' + movie)
   .then(response => {
-    console.log("title: ",response.data.Title)
-    console.log("Year: ",response.data.Year)
-    console.log("IMDB Rating: ",response.data.imdbRating)
-    console.log("Rotten Tomatoes Rating: ",response.data.Ratings[1].Value)
-    console.log("Country: ",response.data.Country)
-    console.log("Language: ",response.data.Language)
-    console.log("Plot: ",response.data.Plot)
-    console.log("Cast: ",response.data.Actors)
+    var movieInfo = {
+      Title: response.data.Title,
+      Year: response.data.Year,
+      imdbRating: response.data.imdbRating,
+      RottenTomatoesRating: response.data.Ratings[1].Value,
+      Country: response.data.Country,
+      Language: response.data.Language,
+      Plot: response.data.Plot,
+      Cast: response.data.Actors
+    }
+    console.log(movieInfo)
+    log(JSON.stringify(movieInfo))
   })
   .catch(err => {
     console.log(err)
@@ -93,5 +107,13 @@ function randomCommand(){
     }
     commandArr = data.split(",")
     decipherCommand(commandArr[0], commandArr[1])
+  })
+}
+
+function log(text){
+  console.log("--------------------------------------------------")
+  fs.appendFile('log.txt', text + '\n', (err) => {
+    if (err) throw err;
+    console.log("saved!")
   })
 }
