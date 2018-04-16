@@ -10,22 +10,26 @@ const client = new Twitter(keys.twitter);
 const command = process.argv[2]
 const param = process.argv.slice(3).join(' ')
 
+decipherCommand(command, param)
+
 // Decipher command
-switch (command){
-  case 'my-tweets':
+function decipherCommand(command, param){
+  switch (command){
+    case 'my-tweets':
     getTweets()
     break;
-  case 'spotify-this-song':
+    case 'spotify-this-song':
     getSongInfo(param)
     break;
-  case 'movie-this':
+    case 'movie-this':
     getMovieInfo(param)
     break;
-  case 'do-what-it-says':
+    case 'do-what-it-says':
     randomCommand()
     break;
-  default:
+    default:
     console.log('Your command is not recognized')
+  }
 }
 
 
@@ -78,5 +82,16 @@ function getMovieInfo(movie){
   })
   .catch(err => {
     console.log(err)
+  })
+}
+
+function randomCommand(){
+  fs.readFile('random.txt', 'utf8', (err, data) =>{
+    if (err){
+      console.log(err);
+      return;
+    }
+    commandArr = data.split(",")
+    decipherCommand(commandArr[0], commandArr[1])
   })
 }
