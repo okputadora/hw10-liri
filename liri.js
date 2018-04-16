@@ -1,7 +1,9 @@
 require('dotenv').config()
 const keys = require('./keys')
+const fs = require('fs')
 const Twitter = require('twitter')
 const Spotify = require('node-spotify-api')
+const axios = require('axios')
 const spotify = new Spotify(keys.spotify);
 const client = new Twitter(keys.twitter);
 
@@ -40,18 +42,41 @@ function getTweets(){
 
 // Get song info
 function getSongInfo(song){
+  if (song == ''){
+    song = 'The Sign'
+  }
   spotify
   .search({ type: 'track', query: song, limit: 1})
-  .then(function(response) {
+  .then(response => {
     console.log('Song: ', response.tracks.items[0].name);
     console.log('Album: ', response.tracks.items[0].album.name);
     console.log('Artist: ', response.tracks.items[0].artists[0].name);
     console.log('Link: ', response.tracks.items[0].external_urls.spotify);
-    // response.tracks.items.forEach(song => {
-    //   console.log(song)
-    // })
   })
   .catch(function(err) {
-    console.log(err);
+    console.log("I didn't recognize that song. Check your spelling and try again.");
   });
+}
+
+// get movie info
+function getMovieInfo(movie){
+  if (movie == ''){
+    console.log("undefined!")
+    movie = 'Mr. Nobody';
+  }
+  axios.get('http://www.omdbapi.com/?apikey='+ process.env.OMDB_KEY +
+            '&t=' + movie)
+  .then(response => {
+    console.log("title: ",response.data.Title)
+    console.log("Year: ",response.data.Year)
+    console.log("IMDB Rating: ",response.data.imdbRating)
+    console.log("Rotten Tomatoes Rating: ",response.data.Ratings[1].Value)
+    console.log("Country: ",response.data.Country)
+    console.log("Language: ",response.data.Language)
+    console.log("Plot: ",response.data.Plot)
+    console.log("Cast: ",response.data.Actors)
+  })
+  .catch(err => {
+    console.log(err)
+  })
 }
